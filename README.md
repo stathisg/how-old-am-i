@@ -2,7 +2,7 @@
 
 ##Description
 
-How Old Am I is a plugin for WordPress, which calculates and displays your age in several formats, giving you up-to-date detailed age information which can be added on your posts and pages, without having to constantly update them.
+[How Old Am I](http://wordpress.org/extend/plugins/how-old-am-i/) is a plugin for WordPress, which calculates and displays your age in several formats, giving you up-to-date detailed age information which can be added on your posts and pages, without having to constantly update them.
 
 ## How to install
 
