@@ -2,7 +2,7 @@
 
 ##Description
 
-[How Old Am I](http://wordpress.org/extend/plugins/how-old-am-i/) is a plugin for WordPress, which calculates and displays your age in several formats, giving you up-to-date detailed age information which can be added on your posts and pages, without having to constantly update them.
+[How Old Am I](http://wordpress.org/extend/plugins/how-old-am-i/) is a plugin for WordPress, which calculates and displays ages in several formats, giving you up-to-date detailed age information which can be added on your posts and pages, without having to constantly update them.
 
 ## How to install
 
@@ -18,7 +18,22 @@
 
 ## How to use
 
-Simply enter the shortcode **[how-old-am-i]** in any post or page.
+Select your date of birth and enter the shortcode **[how-old-am-i]** in any post or page.
+
+The following attributes are available to be used in the shortcode (the attributes can be combined):
+
+* **on** — takes as an argument either a date (format: YYYY-MM-DD) and overrides the current date, or the word "post" and uses the date & time of the post to override the current date
+* **bday** — takes as an argument either a date (format: YYYY-MM-DD) and overrides the birth date set on the plugin's settings, or the word "post" and uses the date & time of the post to override the birth date
+
+Some examples using the attributes:
+
+* **[how-old-am-i on="2013-03-01"]** — displays the age as it was on the 1st of March, 2013
+* **[how-old-am-i on="post"]** — displays the age as it was on the date the post was published on
+* **[how-old-am-i bday="1980-02-22"]** — displays the age using as a birth date the 22nd of February, 1980
+* **[how-old-am-i bday="post"]** — displays the age using as a birth date the date that the post was published on
+* **[how-old-am-i on="2013-03-01" bday="1980-02-22"]** — displays the age of a person born on the 22nd of February, 1980, as it was on the 1st of March, 2013, ignoring both the birth date set in the plugin's setting, and the current date
+* **[how-old-am-i on="post" bday="1980-02-22"]** — the same example as before, using the publish date of the post as the current date
+* **[how-old-am-i on="2013-03-01" bday="post"]** — the same example as before, using the publish date of the post as the birth date
 
 ## Support
 
@@ -30,14 +45,18 @@ The plugin's settings
 
 ![how old am i settings](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-1.jpg)
 
-Example of usage: Default settings
+Example using default settings
 
 ![example using default settings](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-2.jpg)
 
-Example of usage: Custom format with age in numbers
+Example using custom format with age in numbers
 
 ![example using custom format](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-3.jpg)
 
-Example of usage: Custom format with age in full
+Example using Custom format with age in full
 
 ![example using custom format](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-4.jpg)
+
+Example using shortcode attributes
+
+![example using shortcode attributes](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-5.jpg)

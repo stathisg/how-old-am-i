@@ -1,9 +1,9 @@
 <?php
 /**
-* convert_number_to_words function is written by Karl Rixon and can be found at
+* _convert_number_to_words function is written by Karl Rixon and can be found at
 * http://www.karlrixon.co.uk/writing/convert-numbers-to-words-with-php/
 */
-function convert_number_to_words($number) {
+function _convert_number_to_words($number) {
     
     $hyphen      = '-';
     $conjunction = ' and ';
@@ -55,14 +55,14 @@ function convert_number_to_words($number) {
     if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
         // overflow
         trigger_error(
-            'convert_number_to_words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
+            '_convert_number_to_words only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
             E_USER_WARNING
         );
         return false;
     }
 
     if ($number < 0) {
-        return $negative . convert_number_to_words(abs($number));
+        return $negative . _convert_number_to_words(abs($number));
     }
     
     $string = $fraction = null;
@@ -88,17 +88,17 @@ function convert_number_to_words($number) {
             $remainder = $number % 100;
             $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
             if ($remainder) {
-                $string .= $conjunction . convert_number_to_words($remainder);
+                $string .= $conjunction . _convert_number_to_words($remainder);
             }
             break;
         default:
             $baseUnit = pow(1000, floor(log($number, 1000)));
             $numBaseUnits = (int) ($number / $baseUnit);
-            $remainder = $number % $baseUnit;
-            $string = convert_number_to_words($numBaseUnits) . ' ' . $dictionary[$baseUnit];
+            @$remainder = $number % $baseUnit;
+            $string = _convert_number_to_words($numBaseUnits) . ' ' . $dictionary[$baseUnit];
             if ($remainder) {
                 $string .= $remainder < 100 ? $conjunction : $separator;
-                $string .= convert_number_to_words($remainder);
+                $string .= _convert_number_to_words($remainder);
             }
             break;
     }

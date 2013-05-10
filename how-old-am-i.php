@@ -2,27 +2,26 @@
 /*
 Plugin Name: How Old Am I
 Plugin URI: http://burnmind.com/freebies/how-old-am-i
-Version: 1.0.0
+Version: 1.1.0
 Author: Stathis Goudoulakis
 Author URI: http://burnmind.com/
 Description: Calculates and displays your age in several formats.
 
-Copyright 2012 Stathis Goudoulakis (me@stathisg.com)
+Copyright 2013 Stathis Goudoulakis (email: me@stathisg.com)
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+it under the terms of the GNU General Public License, version 2, as
+published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 if (!class_exists("howOldAmI"))
 {
@@ -34,7 +33,7 @@ if (!class_exists("howOldAmI"))
         {
             $adminOptions = array('birthDay' => 1,
                                   'birthMonth' => 1,
-                                  'birthYear' => 1970,
+                                  'birthYear' => 1980,
                                   'calculationType' => 'absolute',
                                   'format' => 'year',
                                   'custom-format' => '',
@@ -51,17 +50,49 @@ if (!class_exists("howOldAmI"))
             return $adminOptions;
         }
 
-        function displayAge()
+        function displayAge($atts)
         {
             $options = $this->getAdminOptions();
+
+            extract(shortcode_atts(array(
+                'on' => false,
+                'bday' => false
+            ), $atts));
 
             $returnValue = '';
 
             if($options['php']==='latest')
             {
-                $birthDate = new DateTime();
-                $birthDate->setDate($options['birthYear'], $options['birthMonth'], $options['birthDay']);
-                $now = new DateTime("now");
+                switch($bday)
+                {
+                    case false:
+                        $birthDate = new DateTime();
+                        $birthDate->setDate($options['birthYear'], $options['birthMonth'], $options['birthDay']);
+                        $birthDate->setTime(0, 0);
+                        break;
+                    case 'post':
+                        $birthDate = new DateTime();
+                        $birthDate->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
+                        $birthDate->setTime(get_the_time('H'), get_the_time('i'));
+                        break;
+                    default:
+                        $birthDate = new DateTime($bday . ' 00:00:00');
+                }
+
+                switch($on)
+                {
+                    case false:
+                        $now = new DateTime("now");
+                        break;
+                    case 'post':
+                        $now = new DateTime();
+                        $now->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
+                        $now->setTime(get_the_time('H'), get_the_time('i'));
+                        break;
+                    default:
+                        $now = new DateTime($on . ' 00:00:00');
+                }
+
                 $difference = $birthDate->diff($now);
 
                 $yearsOld = $difference->y;
@@ -72,8 +103,31 @@ if (!class_exists("howOldAmI"))
             else
             {
                 require_once('_date_diff.php');
-                $birthDate = $options['birthYear'] . '-' . $options['birthMonth'] . '-' . $options['birthDay'];
-                $difference = _date_diff(strtotime($birthDate), time());
+                switch($bday)
+                {
+                    case false:
+                        $birthDate = strtotime($options['birthYear'] . '-' . $options['birthMonth'] . '-' . $options['birthDay']);
+                        break;
+                    case 'post':
+                        $birthDate = get_the_time('U');
+                        break;
+                    default:
+                        $birthDate = strtotime($bday);
+                }
+
+                switch($on)
+                {
+                    case false:
+                        $now = time();
+                        break;
+                    case 'post':
+                        $now = get_the_time('U');
+                        break;
+                    default:
+                        $now = strtotime($on);
+                }
+
+                $difference = _date_diff($birthDate, $now);
 
                 $yearsOld = $difference['y'];
                 $monthsOld = $difference['m'];
@@ -91,7 +145,7 @@ if (!class_exists("howOldAmI"))
                 if($options['format']==='year-words')
                 {
                     require_once('_convert_number_to_words.php');
-                    $returnValue = convert_number_to_words($returnValue);
+                    $returnValue = _convert_number_to_words($returnValue);
                 }
             }
             else if($options['format']==='custom')
@@ -101,10 +155,10 @@ if (!class_exists("howOldAmI"))
                 $returnValue = str_replace('%months%', $monthsOld, $returnValue);
                 $returnValue = str_replace('%days%', $daysOld, $returnValue);
                 $returnValue = str_replace('%total-days%', $totalDaysOld, $returnValue);
-                $returnValue = str_replace('%w-years%', convert_number_to_words($yearsOld), $returnValue);
-                $returnValue = str_replace('%w-months%', convert_number_to_words($monthsOld), $returnValue);
-                $returnValue = str_replace('%w-days%', convert_number_to_words($daysOld), $returnValue);
-                $returnValue = str_replace('%w-total-days%', convert_number_to_words($totalDaysOld), $returnValue);
+                $returnValue = str_replace('%w-years%', _convert_number_to_words($yearsOld), $returnValue);
+                $returnValue = str_replace('%w-months%', _convert_number_to_words($monthsOld), $returnValue);
+                $returnValue = str_replace('%w-days%', _convert_number_to_words($daysOld), $returnValue);
+                $returnValue = str_replace('%w-total-days%', _convert_number_to_words($totalDaysOld), $returnValue);
                 $returnValue = stripslashes($returnValue);
             }
             else
@@ -112,8 +166,8 @@ if (!class_exists("howOldAmI"))
                 if($options['format']==='year-month-words')
                 {
                     require_once('_convert_number_to_words.php');
-                    $yearsOld = convert_number_to_words($yearsOld);
-                    $monthsOld = convert_number_to_words($monthsOld);
+                    $yearsOld = _convert_number_to_words($yearsOld);
+                    $monthsOld = _convert_number_to_words($monthsOld);
                 }
                 $returnValue = "$yearsOld years and $monthsOld months";
             }
@@ -233,7 +287,7 @@ if (!class_exists("howOldAmI"))
                     <h3>PHP version:</h3>
                     <p>If you don't know which PHP version is installed on your server, try the plugin with the default option and if it doesn't work, switch to the other one.</p>
                     <select name="php">
-                        <option value="latest" <?php if ($options['php'] == "latest") { _e('selected="selected"', "HowOldAmI"); }?>>5.3 or later</option>
+                        <option value="latest" <?php if ($options['php'] == "latest") { _e('selected="selected"', "HowOldAmI"); }?>>5.3 or later (recommended)</option>
                         <option value="old" <?php if ($options['php'] == "old") { _e('selected="selected"', "HowOldAmI"); }?>>Older than 5.3</option>
                     </select>
                     <p class="submit">
@@ -242,6 +296,21 @@ if (!class_exists("howOldAmI"))
                 </form>
                 <h2>Usage</h2>
                 <p>Select your date of birth and enter the shortcode <strong>[how-old-am-i]</strong> in any post or page.</p>
+                <p>The following attributes are available to be used in the shortcode (the attributes can be combined):</p>
+                <ul class="ul-disc">
+                     <li><code>on</code> &#8212; takes as an argument either a date (format: YYYY-MM-DD) and overrides the current date, or the word "post" and uses the date &amp; time of the post to override the current date</li>
+                     <li><code>bday</code> &#8212; takes as an argument either a date (format: YYYY-MM-DD) and overrides the birth date set on the plugin's settings, or the word "post" and uses the date &amp; time of the post to override the birth date</li>
+                </ul>
+                <p>Some examples using the attributes:</p>
+                <ul class="ul-disc">
+                     <li><code>[how-old-am-i on="2013-03-01"]</code> &#8212; displays the age as it was on the 1st of March, 2013</li>
+                     <li><code>[how-old-am-i on="post"]</code> &#8212; displays the age as it was on the date the post was published on</li>
+                     <li><code>[how-old-am-i bday="1980-02-22"]</code> &#8212; displays the age using as a birth date the 22nd of February, 1980</li>
+                     <li><code>[how-old-am-i bday="post"]</code> &#8212; displays the age using as a birth date the date that the post was published on</li>
+                     <li><code>[how-old-am-i on="2013-03-01" bday="1980-02-22"]</code> &#8212; displays the age of a person born on the 22nd of February, 1980, as it was on the 1st of March, 2013, ignoring both the birth date set in the plugin's setting, and the current date</li>
+                     <li><code>[how-old-am-i on="post" bday="1980-02-22"]</code> &#8212; the same example as before, using the publish date of the post as the current date</li>
+                     <li><code>[how-old-am-i on="2013-03-01" bday="post"]</code> &#8212; the same example as before, using the publish date of the post as the birth date</li>
+                </ul>
                 <h2>Support &amp; feedback</h2>
                 <p>For questions, issues, or feature requests, you can <a href="http://burnmind.com/contact">contact me</a>, or post them either in the <a href="http://wordpress.org/tags/how-old-am-i">WordPress Forum</a> (make sure to add the tag "how-old-am-i"), or in <a href="http://burnmind.com/freebies/how-old-am-i">this</a> blog post.</p>
                 <h2>How to contribute</h2>
@@ -254,7 +323,7 @@ if (!class_exists("howOldAmI"))
                 </ul>
                 <h2>Other links</h2>
                 <ul>
-                    <li>&raquo; <a href="http://burnmind.com">burnmind.com</a></li>
+                    <li>&raquo; <a href="http://burnmind.com">my blog</a></li>
                     <li>&raquo; <a href="http://twitter.com/stathisg">@stathisg</a></li>
                     <li>&raquo; <a href="http://wordpress.org/extend/plugins/hello-in-all-languages/">Hello in all languages</a> WordPress plugin</li>
                 </ul>
@@ -293,7 +362,8 @@ if (isset($howOldAmI))
     add_action('admin_menu', 'howOldAmIAdmin');
 }
 
-function howOldAmISettingsLink($links) { 
+function howOldAmISettingsLink($links)
+{ 
   $settings_link = '<a href="options-general.php?page=how-old-am-i.php">Settings</a>'; 
   array_unshift($links, $settings_link); 
   return $links; 
