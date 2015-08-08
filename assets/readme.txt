@@ -3,8 +3,8 @@ Contributors: StathisG
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JT4GXFTBH99LS
 Tags: how old am i, age, age calculator, calculate age, automatic age
 Requires at least: 3.0.1
-Tested up to: 3.5.1
-Stable tag: 1.1.0
+Tested up to: 4.2.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,8 @@ How Old Am I calculates and displays ages in several formats, giving you up-to-d
 1. Open the plugin settings page (Settings -> How Old Am I).
 2. Enter your birth date.
 3. Select a display format.
-4. Select the appropriate PHP version (the default selection is PHP 5.3 or later). If you don't know which PHP version is installed on your server, then try the plugin with the default option and if it doesn't work, switch to the other one.
+4. Select how to deal with negative ages.
+5. Select the appropriate PHP version (the default selection is PHP 5.3 or later). If you don't know which PHP version is installed on your server, then try the plugin with the default option and if it doesn't work, switch to the other one.
 
 = How to use =
 
@@ -61,6 +62,9 @@ Some examples using the attributes:
 For questions, issues, or feature requests, you can [contact me](http://burnmind.com/contact), or post them either in the [WordPress Forum](http://wordpress.org/tags/how-old-am-i) (make sure to add the tag "how-old-am-i"), or in [this](http://burnmind.com/freebies/how-old-am-i) blog post.
 
 == Changelog ==
+
+= 1.2.0 =
+* Added the ability to show negative ages.
 
 = 1.1.0 =
 * Added "on" and "bday" shortcode attributes.

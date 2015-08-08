@@ -14,7 +14,8 @@
 1. Open the plugin settings page (Settings -> How Old Am I).
 2. Enter your birth date.
 3. Select a display format.
-4. Select the appropriate PHP version (the default selection is PHP 5.3 or later). If you don't know which PHP version is installed on your server, then try the plugin with the default option and if it doesn't work, switch to the other one.
+4. Select how to deal with negative ages.
+5. Select the appropriate PHP version (the default selection is PHP 5.3 or later). If you don't know which PHP version is installed on your server, then try the plugin with the default option and if it doesn't work, switch to the other one.
 
 ## How to use
 
@@ -60,3 +61,14 @@ Example using Custom format with age in full
 Example using shortcode attributes
 
 ![example using shortcode attributes](https://raw.github.com/stathisg/how-old-am-i/master/assets/screenshot-5.jpg)
+
+## Changelog
+
+### 1.2.0
+* Added the ability to show negative ages.
+
+### 1.1.0
+* Added "on" and "bday" shortcode attributes.
+
+### 1.0.0
+* Initial release.

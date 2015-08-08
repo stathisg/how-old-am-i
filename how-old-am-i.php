@@ -2,12 +2,12 @@
 /*
 Plugin Name: How Old Am I
 Plugin URI: http://burnmind.com/freebies/how-old-am-i
-Version: 1.1.0
+Version: 1.2.0
 Author: Stathis Goudoulakis
-Author URI: http://burnmind.com/
+Author URI: http://stathisg.com/
 Description: Calculates and displays your age in several formats.
 
-Copyright 2013 Stathis Goudoulakis (email: me@stathisg.com)
+Copyright 2012-2015 Stathis Goudoulakis (email: me@stathisg.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as
@@ -37,7 +37,11 @@ if (!class_exists("howOldAmI"))
                                   'calculationType' => 'absolute',
                                   'format' => 'year',
                                   'custom-format' => '',
-                                  'php' => 'latest');
+                                  'php' => 'latest',
+                                  'negativeAgeEnabled' => false,
+                                  'negativeAgeDisplay' => 'symbol',
+                                  'negativeAgeCustomDisplay' => '',
+                                  'negativeAgePosition' => 0);
             $options = get_option($this->adminOptionsTitle);
             if(!empty($options))
             {
@@ -171,6 +175,32 @@ if (!class_exists("howOldAmI"))
                 }
                 $returnValue = "$yearsOld years and $monthsOld months";
             }
+
+            if($birthDate > $now && $options['negativeAgeEnabled']) {
+                switch ($options['negativeAgeDisplay']) {
+                    case 'symbol':
+                        $negative_symbol_word = '-';
+                        break;
+                    
+                    case 'word':
+                        $negative_symbol_word = 'minus ';
+                        break;
+                    
+                    case 'custom':
+                        $negative_symbol_word = stripslashes($options['negativeAgeCustomDisplay']);
+                        break;
+                    
+                    default:
+                        $negative_symbol_word = '';
+                        break;
+                }
+
+                if($options['negativeAgePosition'] === 0) {
+                    $returnValue = $negative_symbol_word . $returnValue;
+                } else {
+                    $returnValue = $returnValue . $negative_symbol_word;
+                }
+            }
             
             return $returnValue;
         }
@@ -214,6 +244,30 @@ if (!class_exists("howOldAmI"))
                 if (isset($_POST['php']))
                 {
                     $options['php'] = $_POST['php'];
+                }
+
+                if (empty($_POST['negative-display-status']))
+                {
+                    $options['negativeAgeEnabled'] = false;
+                }
+                else
+                {
+                    $options['negativeAgeEnabled'] = true;
+                }
+
+                if (isset($_POST['negative-display']))
+                {
+                    $options['negativeAgeDisplay'] = $_POST['negative-display'];
+                }
+
+                if (isset($_POST['negative-display-custom']))
+                {
+                    $options['negativeAgeCustomDisplay'] = $_POST['negative-display-custom'];
+                }
+
+                if (isset($_POST['negative-display-position']))
+                {
+                    $options['negativeAgePosition'] = intval($_POST['negative-display-position']);
                 }
 
                 update_option($this->adminOptionsTitle, $options);
@@ -261,7 +315,7 @@ if (!class_exists("howOldAmI"))
                     </p>
                     <p>
                         <input type="radio" id="format-custom" name="format" value="custom" <?php if ($options['format'] == "custom") { _e('checked="checked"', "HowOldAmI"); }?> />
-                        <label for="format-custom">Custom</label> <input name="custom-format" type="text" value="<?php echo stripslashes($options['custom-format']); ?>" class="regular-text" placeholder="" />
+                        <label for="format-custom">Custom</label> <input name="custom-format" type="text" value="<?php echo htmlentities(stripslashes($options['custom-format'])); ?>" class="regular-text" placeholder="" />
                         <p>You can use the following tags in custom mode:</p>
                         <ul class="ul-disc">
                             <li><code>%years%</code> &#8212; age in years (number) <span class="description">(e.g. "25")</span></li>
@@ -282,8 +336,31 @@ if (!class_exists("howOldAmI"))
                     </p>
                     <p>
                         <input type="radio" id="calculation-relative" name="calculationType" value="relative" <?php if ($options['calculationType'] == "relative") { _e('checked="checked"', "HowOldAmI"); }?> />
-                        <label for="calculation-relative">Relative <span class="description">(e.g. if you are 25 years and 6 months old or over, it will display "26";)</span></label>
+                        <label for="calculation-relative">Relative <span class="description">(e.g. if you are 25 years and 6 months old or over, it will display "26")</span></label>
                     </p>
+                    <h3>Select how to deal with negative ages:</h3>
+                    <p>
+                        <input type="checkbox" id="negative-display-status" name="negative-display-status" <?php if($options['negativeAgeEnabled']) { _e('checked="checked"', "HowOldAmI"); } ?>/>
+                        <label for="negative-display-status">Show negative ages <span class="description">(if disabled, all negative ages will be displayed without a symbol or word indicating that they are negative)</span></label>
+                    </p>
+                    <p>Select which symbol or word will be displayed in case of a negative age:</p>
+                    <p>
+                        <input type="radio" id="negative-display-symbol" name="negative-display" value="symbol" <?php if ($options['negativeAgeDisplay'] == "symbol") { _e('checked="checked"', "HowOldAmI"); }?> />
+                        <label for="negative-display-symbol">Minus symbol <span class="description">(e.g. "−26")</span></label>
+                    </p>
+                    <p>
+                        <input type="radio" id="negative-display-word" name="negative-display" value="word" <?php if ($options['negativeAgeDisplay'] == "word") { _e('checked="checked"', "HowOldAmI"); }?> />
+                        <label for="negative-display-word">Minus word <span class="description">(e.g. "minus 26")</span></label>
+                    </p>
+                    <p>
+                        <input type="radio" id="negative-display-custom" name="negative-display" value="custom" <?php if ($options['negativeAgeDisplay'] == "custom") { _e('checked="checked"', "HowOldAmI"); }?> />
+                        <label for="negative-display-custom">Custom</label> <input name="negative-display-custom" type="text" value="<?php echo htmlentities(stripslashes($options['negativeAgeCustomDisplay'])); ?>" class="regular-text" placeholder="" />
+                    </p>
+                    <p>Select the position of the negative symbol or word:</p>
+                    <select name="negative-display-position">
+                        <option value="0" <?php if ($options['negativeAgePosition'] == "0") { _e('selected="selected"', "HowOldAmI"); }?>>Before the age</option>
+                        <option value="1" <?php if ($options['negativeAgePosition'] == "1") { _e('selected="selected"', "HowOldAmI"); }?>>After the age</option>
+                    </select>
                     <h3>PHP version:</h3>
                     <p>If you don't know which PHP version is installed on your server, try the plugin with the default option and if it doesn't work, switch to the other one.</p>
                     <select name="php">
