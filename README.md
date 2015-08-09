@@ -15,7 +15,6 @@
 2. Enter your birth date.
 3. Select a display format.
 4. Select how to deal with negative ages.
-5. Select the appropriate PHP version (the default selection is PHP 5.3 or later). If you don't know which PHP version is installed on your server, then try the plugin with the default option and if it doesn't work, switch to the other one.
 
 ## How to use
 
@@ -66,6 +65,7 @@ Example using shortcode attributes
 
 ### 1.2.0
 * Added the ability to show negative ages.
+* Removed support for PHP versions lower than 5.3 since WordPress rejects legacy code needed to make the plugin work for such versions.
 
 ### 1.1.0
 * Added "on" and "bday" shortcode attributes.
