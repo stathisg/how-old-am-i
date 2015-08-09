@@ -37,7 +37,6 @@ if (!class_exists("howOldAmI"))
                                   'calculationType' => 'absolute',
                                   'format' => 'year',
                                   'custom-format' => '',
-                                  'php' => 'latest',
                                   'negativeAgeEnabled' => false,
                                   'negativeAgeDisplay' => 'symbol',
                                   'negativeAgeCustomDisplay' => '',
@@ -65,79 +64,42 @@ if (!class_exists("howOldAmI"))
 
             $returnValue = '';
 
-            if($options['php']==='latest')
+            switch($bday)
             {
-                switch($bday)
-                {
-                    case false:
-                        $birthDate = new DateTime();
-                        $birthDate->setDate($options['birthYear'], $options['birthMonth'], $options['birthDay']);
-                        $birthDate->setTime(0, 0);
-                        break;
-                    case 'post':
-                        $birthDate = new DateTime();
-                        $birthDate->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
-                        $birthDate->setTime(get_the_time('H'), get_the_time('i'));
-                        break;
-                    default:
-                        $birthDate = new DateTime($bday . ' 00:00:00');
-                }
-
-                switch($on)
-                {
-                    case false:
-                        $now = new DateTime("now");
-                        break;
-                    case 'post':
-                        $now = new DateTime();
-                        $now->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
-                        $now->setTime(get_the_time('H'), get_the_time('i'));
-                        break;
-                    default:
-                        $now = new DateTime($on . ' 00:00:00');
-                }
-
-                $difference = $birthDate->diff($now);
-
-                $yearsOld = $difference->y;
-                $monthsOld = $difference->m;
-                $daysOld = $difference->d;
-                $totalDaysOld = $difference->days;
+                case false:
+                    $birthDate = new DateTime();
+                    $birthDate->setDate($options['birthYear'], $options['birthMonth'], $options['birthDay']);
+                    $birthDate->setTime(0, 0);
+                    break;
+                case 'post':
+                    $birthDate = new DateTime();
+                    $birthDate->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
+                    $birthDate->setTime(get_the_time('H'), get_the_time('i'));
+                    break;
+                default:
+                    $birthDate = new DateTime($bday . ' 00:00:00');
             }
-            else
+
+            switch($on)
             {
-                require_once('_date_diff.php');
-                switch($bday)
-                {
-                    case false:
-                        $birthDate = strtotime($options['birthYear'] . '-' . $options['birthMonth'] . '-' . $options['birthDay']);
-                        break;
-                    case 'post':
-                        $birthDate = get_the_time('U');
-                        break;
-                    default:
-                        $birthDate = strtotime($bday);
-                }
-
-                switch($on)
-                {
-                    case false:
-                        $now = time();
-                        break;
-                    case 'post':
-                        $now = get_the_time('U');
-                        break;
-                    default:
-                        $now = strtotime($on);
-                }
-
-                $difference = _date_diff($birthDate, $now);
-
-                $yearsOld = $difference['y'];
-                $monthsOld = $difference['m'];
-                $daysOld = $difference['d'];
-                $totalDaysOld = $difference['days'];
+                case false:
+                    $now = new DateTime("now");
+                    break;
+                case 'post':
+                    $now = new DateTime();
+                    $now->setDate(get_the_date('Y'),get_the_date('m'),get_the_date('d'));
+                    $now->setTime(get_the_time('H'), get_the_time('i'));
+                    break;
+                default:
+                    $now = new DateTime($on . ' 00:00:00');
             }
+
+            $difference = $birthDate->diff($now);
+
+            $yearsOld = $difference->y;
+            $monthsOld = $difference->m;
+            $daysOld = $difference->d;
+            $totalDaysOld = $difference->days;
 
             if($options['format']==='year' || $options['format']==='year-words')
             {
@@ -239,11 +201,6 @@ if (!class_exists("howOldAmI"))
                 if (isset($_POST['custom-format']))
                 {
                     $options['custom-format'] = $_POST['custom-format'];
-                }
-
-                if (isset($_POST['php']))
-                {
-                    $options['php'] = $_POST['php'];
                 }
 
                 if (empty($_POST['negative-display-status']))
@@ -360,12 +317,6 @@ if (!class_exists("howOldAmI"))
                     <select name="negative-display-position">
                         <option value="0" <?php if ($options['negativeAgePosition'] == "0") { _e('selected="selected"', "HowOldAmI"); }?>>Before the age</option>
                         <option value="1" <?php if ($options['negativeAgePosition'] == "1") { _e('selected="selected"', "HowOldAmI"); }?>>After the age</option>
-                    </select>
-                    <h3>PHP version:</h3>
-                    <p>If you don't know which PHP version is installed on your server, try the plugin with the default option and if it doesn't work, switch to the other one.</p>
-                    <select name="php">
-                        <option value="latest" <?php if ($options['php'] == "latest") { _e('selected="selected"', "HowOldAmI"); }?>>5.3 or later (recommended)</option>
-                        <option value="old" <?php if ($options['php'] == "old") { _e('selected="selected"', "HowOldAmI"); }?>>Older than 5.3</option>
                     </select>
                     <p class="submit">
                         <input type="submit" name="updateHowOldAmI" value="<?php _e('Update Settings', 'HowOldAmI') ?>" class="button-primary" />
